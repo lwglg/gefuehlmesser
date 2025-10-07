@@ -12,14 +12,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/utilitary/healthcheck",
-					"protocol": "http",
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/{{utilitaryApi}}/healthcheck",
+					"protocol": "{{protocol}}",
 					"host": [
-						"localhost"
+						"{{hostname}}"
 					],
-					"port": "8080",
+					"port": "{{port}}",
 					"path": [
-						"utilitary",
+						"{{utilitaryApi}}",
 						"healthcheck"
 					]
 				}
@@ -27,7 +27,7 @@
 			"response": []
 		},
 		{
-			"name": "perform-feed-analysis",
+			"name": "get-feed-sentiment",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -41,17 +41,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/v1/feeds/analyze",
-					"protocol": "http",
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/{{apiRoot}}/{{apiVersion}}/{{sentimentApi}}/feed",
+					"protocol": "{{protocol}}",
 					"host": [
-						"localhost"
+						"{{hostname}}"
 					],
-					"port": "8080",
+					"port": "{{port}}",
 					"path": [
-						"api",
-						"v1",
-						"feeds",
-						"analyze"
+						"{{apiRoot}}",
+						"{{apiVersion}}",
+						"{{sentimentApi}}",
+						"feed"
 					],
 					"query": [
 						{
@@ -59,6 +59,68 @@
 							"value": null,
 							"disabled": true
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-message-sentiment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"msg_002\",\n    \"content\": \"Não gostei do atendimento, péssimo\",\n    \"timestamp\": \"2025-09-10T10:02:00Z\",\n    \"user_id\": \"user_987\",\n    \"hashtags\": [\"#atendimento\"],\n    \"reactions\": 4,\n    \"shares\": 1,\n    \"views\": 80\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/{{apiRoot}}/{{apiVersion}}/{{sentimentApi}}/message",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{apiRoot}}",
+						"{{apiVersion}}",
+						"{{sentimentApi}}",
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-feed-sentiment-edge-cases",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"messages\": [\n    { \"id\": \"e1\", \"content\": \"muito\", \"timestamp\": \"2025-09-10T10:00:00Z\", \"user_id\": \"user_aa1\", \"hashtags\": [], \"reactions\": 0, \"shares\": 0, \"views\": 1 },\n    { \"id\": \"e2\", \"content\": \"não não gostei\", \"timestamp\": \"2025-09-10T10:00:01Z\", \"user_id\": \"user_aa2\", \"hashtags\": [], \"reactions\": 0, \"shares\": 0, \"views\": 1 },\n    { \"id\": \"e3\", \"content\": \"#produto-novo ótimo!\", \"timestamp\": \"2025-09-10T10:00:02Z\", \"user_id\": \"user_aa3\", \"hashtags\": [\"#produto-novo\"], \"reactions\": 5, \"shares\": 1, \"views\": 50 },\n    { \"id\": \"e4\", \"content\": \"adorei muito este café!\", \"timestamp\": \"2025-09-10T10:00:03Z\", \"user_id\": \"user_café\", \"hashtags\": [\"#café\"], \"reactions\": 5, \"shares\": 1, \"views\": 50 },\n    { \"id\": \"e5\", \"content\": \"produto perfeito\", \"timestamp\": \"2025-09-10T10:00:04Z\", \"user_id\": \"user_13chars\", \"hashtags\": [\"#perfeito\"], \"reactions\": 3, \"shares\": 1, \"views\": 30 },\n    { \"id\": \"e6\", \"content\": \"excelente qualidade\", \"timestamp\": \"2025-09-10T10:00:05Z\", \"user_id\": \"user_math_prime\", \"hashtags\": [\"#qualidade\"], \"reactions\": 4, \"shares\": 3, \"views\": 35 },\n    { \"id\": \"e7\", \"content\": \"super adorei o produto mbras especificamente!\", \"timestamp\": \"2025-09-10T10:00:06Z\", \"user_id\": \"user_mbras_special\", \"hashtags\": [\"#verylonghashtag\", \"#short\"], \"reactions\": 7, \"shares\": 0, \"views\": 70 },\n    { \"id\": \"e8\", \"content\": \"terrível atendimento hoje\", \"timestamp\": \"2025-09-10T10:00:07Z\", \"user_id\": \"user_negative_test\", \"hashtags\": [\"#atendimento\"], \"reactions\": 2, \"shares\": 0, \"views\": 25 }\n  ],\n  \"time_window_minutes\": 30\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{protocol}}://{{hostname}}:{{port}}/{{apiRoot}}/{{apiVersion}}/{{sentimentApi}}/feed",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{apiRoot}}",
+						"{{apiVersion}}",
+						"{{sentimentApi}}",
+						"feed"
 					]
 				}
 			},

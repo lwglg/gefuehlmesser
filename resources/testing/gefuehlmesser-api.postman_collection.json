@@ -1,0 +1,68 @@
+{
+	"info": {
+		"_postman_id": "1d5aa9b4-73b3-404f-a9ac-da77f4bf111d",
+		"name": "gefuehlmesser-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40959588"
+	},
+	"item": [
+		{
+			"name": "healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/utilitary/healthcheck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"utilitary",
+						"healthcheck"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "perform-feed-analysis",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"messages\": [\n        {\n            \"id\": \"msg_001\",\n            \"content\": \"Adorei o novo produto!\",\n            \"timestamp\": \"2025-09-10T10:00:00Z\",\n            \"user_id\": \"user_123\",\n            \"hashtags\": [\"#produto\", \"#review\"],\n            \"reactions\": 10,\n            \"shares\": 2,\n            \"views\": 100\n        },\n        {\n            \"id\": \"msg_002\",\n            \"content\": \"Não gostei do atendimento, péssimo\",\n            \"timestamp\": \"2025-09-10T10:02:00Z\",\n            \"user_id\": \"user_987\",\n            \"hashtags\": [\"#atendimento\"],\n            \"reactions\": 4,\n            \"shares\": 1,\n            \"views\": 80\n        },\n        {\n            \"id\": \"msg_003\",\n            \"content\": \"Super excelente! Produto perfeito\",\n            \"timestamp\": \"2025-09-10T10:04:30Z\",\n            \"user_id\": \"user_mbras_1007\",\n            \"hashtags\": [\"#produto\", \"#top\"],\n            \"reactions\": 20,\n            \"shares\": 5,\n            \"views\": 300\n        }\n    ],\n    \"time_window_minutes\": 30\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/feeds/analyze",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"feeds",
+						"analyze"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

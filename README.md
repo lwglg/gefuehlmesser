@@ -42,11 +42,11 @@ Em linhas gerais, o projeto é composto de:
     - Requisições para determinar a análise de sentimento para:
       - Um feed com um conjunto de mensagens;
       - Uma única mensagem; 
-- `infra`: Contem as declarações do [manifesto](./infra/docker/compose.yml) do Docker Compose da [imagem](./infra/docker/webservice/Dockerfile) Docker do serviço `webservice`, além de arquivos subsidiários ao funcionamento do servidor
+- `infra`: Contem as declarações do [manifesto](./infra/docker/compose.yml) do Docker Compose da [imagem](./infra/docker/webservice/Dockerfile) Docker do serviço `webservice`, além de arquivos subsidiários ao funcionamento do servidor;
 - `Makefile`: Comandos executados via `make`, implementados para facilitar a manipulação da camada de automação do projeto;
-- `scripts`: Scripts que são consumidos pelos comandos executados via `make`
+- `scripts`: Scripts que são consumidos pelos comandos executados via `make`;
 - `.github` Uma camada de infraestrutura como código (IaC). Na pasta `workflows`, foram implementadas duas pipelines, executadas automaticamente pelo Github Actions:
-  - `static-analysis.yml`: Realiza a execução de testes unitários, verificação de vulnerabilidades e linting do código-fonte
+  - `static-analysis.yml`: Realiza a execução de testes unitários, verificação de vulnerabilidades e linting do código-fonte;
   - `image-analysis.yml`: Realiza a análise de sanidade da imagem Docker do serviço `webservice`, de modo a garantir o uso eficiente dos recursos do contêiner, em tempo de execução.
 
 

@@ -52,7 +52,8 @@ HELP_FUN = \
 		ps \
 		imganalysisci \
 		imganalysisui \
-		topology
+		analysis \
+		topology 
 
 .DEFAULT_GOAL := help
 
@@ -135,6 +136,9 @@ imganalysisci: ## Executa a análise de uma imagem Docker, em modo CI, dado uma 
 
 topology: ## Gera um diagrama dos serviços listados no arquivo YML do Docker Compose
 	@./scripts/generate-topology.sh topology $(env)
+
+analysis: ## Realiza a análise estática do código-fonte, dado um m=<vulnerability | construct | test | format | all> modo de execução válido
+	@./scripts/static-analysis.sh $(m)
 
 swagger: ## Gera ou atualiza package Go associada à geração da documentação da API (Swagger UI)
 	@./webservice/bin/swag init -d ./webservice/cmd/api,./webservice -o ./webservice/docs

@@ -1,0 +1,42 @@
+name: Image Analysis
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - "feature/*"
+      - "bugfix/*"
+      - "docs/*"
+      - "refactor/*"
+      - "develop"
+  push:
+    branches:
+      - "feature/*"
+      - "bugfix/*"
+      - "docs/*"
+      - "refactor/*"
+      - "develop"
+
+jobs:
+  dive-analysis-dev:
+    name: Analysis of the Docker images for development environment.
+    runs-on: ubuntu-latest
+    env:
+      DIVE_VERSION: "0.13.1"
+      COMPOSE_YML: "${{ github.workspace }}/infra/docker/compose.yml"
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Build image for the 'webservice' service
+        timeout-minutes: 10
+        run: |
+          docker compose -f $COMPOSE_YML build webservice
+
+      - name: Perform image analysis for the 'webservice' service
+        timeout-minutes: 2
+        env:
+          CI: "true"
+        run: |
+          wget -qO- "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | sudo tar xvz -C /usr/local/bin
+          dive --ci-config "${{ github.workspace }}/.dive-ci.yaml" mbras/gefuehlmesser-webservice:latest

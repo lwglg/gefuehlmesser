@@ -13,7 +13,10 @@ require (
 
 require github.com/swaggo/files v1.0.1 // indirect
 
-require github.com/swaggo/http-swagger v1.3.4
+require (
+	github.com/swaggo/http-swagger v1.3.4
+	golang.org/x/text v0.29.0
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -40,6 +43,5 @@ require (
 	golang.org/x/net v0.44.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
 )

@@ -22,7 +22,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/feeds/analyze": {
+        "/api/v1/sentiment/feed": {
             "post": {
                 "description": "Realiza a análise determinística de sentimento das mensagens de um feed, dada uma payload de feed válida.",
                 "consumes": [
@@ -32,9 +32,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "API de feed"
+                    "API de análise de sentimentos"
                 ],
-                "summary": "Análise de sentimento",
+                "summary": "Análise de sentimento de feed",
                 "parameters": [
                     {
                         "description": "Payload contendo as mensagens de feed e parâmetro de janela temporal.",
@@ -50,7 +50,59 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sentiment.SentimentAnalysis"
+                            "$ref": "#/definitions/sentiment.FeedSentiment"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/err.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/err.Errors"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/err.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sentiment/message": {
+            "post": {
+                "description": "Realiza a análise determinística de sentimento de uma mensagem de feed, dada uma payload de feed válida.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API de análise de sentimentos"
+                ],
+                "summary": "Análise de sentimento de mensagem",
+                "parameters": [
+                    {
+                        "description": "Payload contendo a estrutura de uma mensagen de feed.",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sentiment.FeedMessage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sentiment.MessageSentiment"
                         }
                     },
                     "400": {
@@ -180,7 +232,7 @@ const docTemplate = `{
             "properties": {
                 "content": {
                     "type": "string",
-                    "maxLength": 255
+                    "maxLength": 280
                 },
                 "hashtags": {
                     "type": "array",
@@ -195,9 +247,15 @@ const docTemplate = `{
                     "type": "integer",
                     "minimum": 0
                 },
+                "sentiment": {
+                    "$ref": "#/definitions/sentiment.MessageSentiment"
+                },
                 "shares": {
                     "type": "integer",
                     "minimum": 0
+                },
+                "timeWindow": {
+                    "type": "string"
                 },
                 "timestamp": {
                     "type": "string"
@@ -211,7 +269,7 @@ const docTemplate = `{
                 }
             }
         },
-        "sentiment.SentimentAnalysis": {
+        "sentiment.FeedSentiment": {
             "type": "object",
             "properties": {
                 "anomaly_detected": {
@@ -224,10 +282,16 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "flags": {
-                    "$ref": "#/definitions/sentiment.SentimentAnalysisFlags"
+                    "$ref": "#/definitions/sentiment.FeedSentimentFlags"
+                },
+                "influence_ranking": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sentiment.UserInfluenceRanking"
+                    }
                 },
                 "sentiment_distribution": {
-                    "$ref": "#/definitions/sentiment.SentimentDistribution"
+                    "$ref": "#/definitions/sentiment.FeedSentimentDistribution"
                 },
                 "trending_topics": {
                     "type": "array",
@@ -237,7 +301,21 @@ const docTemplate = `{
                 }
             }
         },
-        "sentiment.SentimentAnalysisFlags": {
+        "sentiment.FeedSentimentDistribution": {
+            "type": "object",
+            "properties": {
+                "negative": {
+                    "type": "number"
+                },
+                "neutral": {
+                    "type": "number"
+                },
+                "positive": {
+                    "type": "number"
+                }
+            }
+        },
+        "sentiment.FeedSentimentFlags": {
             "type": "object",
             "properties": {
                 "candidate_awareness": {
@@ -251,17 +329,25 @@ const docTemplate = `{
                 }
             }
         },
-        "sentiment.SentimentDistribution": {
+        "sentiment.MessageSentiment": {
             "type": "object",
             "properties": {
-                "negative": {
+                "label": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                }
+            }
+        },
+        "sentiment.UserInfluenceRanking": {
+            "type": "object",
+            "properties": {
+                "influence_score": {
                     "type": "number"
                 },
-                "neutral": {
-                    "type": "number"
-                },
-                "positive": {
-                    "type": "number"
+                "user_id": {
+                    "type": "string"
                 }
             }
         }

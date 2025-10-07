@@ -43,7 +43,7 @@ definitions:
   sentiment.FeedMessage:
     properties:
       content:
-        maxLength: 255
+        maxLength: 280
         type: string
       hashtags:
         items:
@@ -54,9 +54,13 @@ definitions:
       reactions:
         minimum: 0
         type: integer
+      sentiment:
+        $ref: '#/definitions/sentiment.MessageSentiment'
       shares:
         minimum: 0
         type: integer
+      timeWindow:
+        type: string
       timestamp:
         type: string
       user_id:
@@ -74,7 +78,7 @@ definitions:
     - user_id
     - views
     type: object
-  sentiment.SentimentAnalysis:
+  sentiment.FeedSentiment:
     properties:
       anomaly_detected:
         type: boolean
@@ -83,15 +87,28 @@ definitions:
       engagement_score:
         type: number
       flags:
-        $ref: '#/definitions/sentiment.SentimentAnalysisFlags'
+        $ref: '#/definitions/sentiment.FeedSentimentFlags'
+      influence_ranking:
+        items:
+          $ref: '#/definitions/sentiment.UserInfluenceRanking'
+        type: array
       sentiment_distribution:
-        $ref: '#/definitions/sentiment.SentimentDistribution'
+        $ref: '#/definitions/sentiment.FeedSentimentDistribution'
       trending_topics:
         items:
           type: string
         type: array
     type: object
-  sentiment.SentimentAnalysisFlags:
+  sentiment.FeedSentimentDistribution:
+    properties:
+      negative:
+        type: number
+      neutral:
+        type: number
+      positive:
+        type: number
+    type: object
+  sentiment.FeedSentimentFlags:
     properties:
       candidate_awareness:
         type: boolean
@@ -100,14 +117,19 @@ definitions:
       special_pattern:
         type: boolean
     type: object
-  sentiment.SentimentDistribution:
+  sentiment.MessageSentiment:
     properties:
-      negative:
+      label:
+        type: string
+      score:
         type: number
-      neutral:
+    type: object
+  sentiment.UserInfluenceRanking:
+    properties:
+      influence_score:
         type: number
-      positive:
-        type: number
+      user_id:
+        type: string
     type: object
 info:
   contact:
@@ -120,7 +142,7 @@ info:
   title: Gefuehlmesser API
   version: 1.0.0
 paths:
-  /api/v1/feeds/analyze:
+  /api/v1/sentiment/feed:
     post:
       consumes:
       - application/json
@@ -139,7 +161,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/sentiment.SentimentAnalysis'
+            $ref: '#/definitions/sentiment.FeedSentiment'
         "400":
           description: Bad Request
           schema:
@@ -152,9 +174,44 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/err.Error'
-      summary: Análise de sentimento
+      summary: Análise de sentimento de feed
       tags:
-      - API de feed
+      - API de análise de sentimentos
+  /api/v1/sentiment/message:
+    post:
+      consumes:
+      - application/json
+      description: Realiza a análise determinística de sentimento de uma mensagem
+        de feed, dada uma payload de feed válida.
+      parameters:
+      - description: Payload contendo a estrutura de uma mensagen de feed.
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/sentiment.FeedMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sentiment.MessageSentiment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/err.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/err.Errors'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/err.Error'
+      summary: Análise de sentimento de mensagem
+      tags:
+      - API de análise de sentimentos
   /utilitary/healthcheck:
     get:
       description: Realiza uma requisição de healthcheck ao servidor, retornnando

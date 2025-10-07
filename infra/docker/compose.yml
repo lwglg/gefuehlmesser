@@ -1,0 +1,25 @@
+version: "3.9"
+
+
+services:
+  webservice:
+    container_name: mbras-gefuehlmesser-webservices-ctnr
+    image: mbras/gefuehlmesser-webservice:latest
+    build:
+      context: ../..
+      dockerfile: ./infra/docker/webservice/Dockerfile
+    env_file: ./webservice/.webservice.env
+    ports:
+      - "8080:8080"
+    restart: always
+    volumes:
+      - ../../webservice/api:/home/gefuehlmesser/webservice/api
+      - ../../webservice/cmd:/home/gefuehlmesser/webservice/cmd
+      - ../../webservice/config:/home/gefuehlmesser/webservice/config
+      - ../../webservice/docs:/home/gefuehlmesser/webservice/docs
+      - ../../webservice/libs:/home/gefuehlmesser/webservice/libs
+    networks:
+      - default-net
+
+networks:
+  default-net:

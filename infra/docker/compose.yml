@@ -13,11 +13,7 @@ services:
       - "8080:8080"
     restart: always
     volumes:
-      - ../../webservice/api:/home/gefuehlmesser/webservice/api
-      - ../../webservice/cmd:/home/gefuehlmesser/webservice/cmd
-      - ../../webservice/config:/home/gefuehlmesser/webservice/config
       - ../../webservice/docs:/home/gefuehlmesser/webservice/docs
-      - ../../webservice/libs:/home/gefuehlmesser/webservice/libs
     networks:
       - default-net
 

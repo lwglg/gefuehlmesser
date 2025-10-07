@@ -19,11 +19,7 @@ COPY ${WS_ROOT}/config ./config
 COPY ${WS_ROOT}/docs ./docs
 COPY ${WS_ROOT}/libs ./libs
 
-RUN go build \
-    -ldflags '-w -s' \
-    -a \
-    -o ./bin/api \
-    ./cmd/api
+RUN go build -ldflags '-w -s' -a -o ./bin/api ./cmd/api
 
 EXPOSE 8080
 

@@ -13,9 +13,9 @@ var (
 	RespJSONEncodeFailure = []byte(`{"error": "json encode failure"}`)
 	RespJSONDecodeFailure = []byte(`{"error": "json decode failure"}`)
 
-	RespInvalidURLParamID        = []byte(`{"error": "invalid url param-id"}`)
-	RespSentimentAnalysisFailure = []byte(`{"error": "an error occurred while performing the sentiment analysis"}`)
-	RespHealthCheckFailure       = []byte(`{"error": "Error while trasmitting healthcheck data"}`)
+	RespInvalidURLParamID    = []byte(`{"error": "invalid url param-id"}`)
+	RespFeedSentimentFailure = []byte(`{"error": "an error occurred while performing the sentiment analysis"}`)
+	RespHealthCheckFailure   = []byte(`{"error": "Error while trasmitting healthcheck data"}`)
 )
 
 type Error struct {

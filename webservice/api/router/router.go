@@ -19,19 +19,17 @@ import (
 	sa "webservice/libs/sentiment"
 )
 
-func New(l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer) *chi.Mux {
-	r := chi.NewRouter()
-
-	SetSwaggetInfo(docs.SwaggerInfo)
-
-	r.Route("/utilitary", func(r chi.Router) {
+func mountUtilitaryApi(r *chi.Mux, l *zerolog.Logger) {
+	(*r).Route("/utilitary", func(r chi.Router) {
 		r.Use(middleware.ContentTypeJSON)
 
 		healthCheckAPI := healthcheck.New(l)
 		r.Method(http.MethodGet, "/healthcheck", requestlog.NewHandler(healthCheckAPI.Read, l))
 	})
+}
 
-	r.Route("/api/v1", func(r chi.Router) {
+func mountSentimentApi(r *chi.Mux, l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer) {
+	(*r).Route("/api/v1", func(r chi.Router) {
 		r.Use(middleware.RequestID)
 		r.Use(middleware.ContentTypeJSON)
 
@@ -42,8 +40,18 @@ func New(l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer) *chi
 		)
 
 		feedAPI := feed.New(l, v, a)
-		r.Method(http.MethodPost, "/feeds/analyze", requestlog.NewHandler(feedAPI.AnalyzeFeed, l))
+		r.Method(http.MethodPost, "/sentiment/feed", requestlog.NewHandler(feedAPI.AnalyzeFeed, l))
+		r.Method(http.MethodPost, "/sentiment/message", requestlog.NewHandler(feedAPI.AnalyzeMessage, l))
 	})
+}
+
+func New(l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer) *chi.Mux {
+	r := chi.NewRouter()
+
+	SetSwaggetInfo(docs.SwaggerInfo)
+
+	mountUtilitaryApi(r, l)
+	mountSentimentApi(r, l, v, a)
 
 	return r
 }

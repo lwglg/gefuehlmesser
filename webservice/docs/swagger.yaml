@@ -1,0 +1,176 @@
+definitions:
+  err.Error:
+    properties:
+      error:
+        type: string
+    type: object
+  err.Errors:
+    properties:
+      errors:
+        items:
+          type: string
+        type: array
+    type: object
+  healthcheck.HealthcheckData:
+    properties:
+      message:
+        type: string
+      request_id:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  sentiment.AnomalyType-bool-string:
+    properties:
+      flag:
+        type: boolean
+      type:
+        type: string
+    type: object
+  sentiment.Feed:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/sentiment.FeedMessage'
+        type: array
+      time_window_minutes:
+        minimum: 0
+        type: integer
+    required:
+    - messages
+    - time_window_minutes
+    type: object
+  sentiment.FeedMessage:
+    properties:
+      content:
+        maxLength: 255
+        type: string
+      hashtags:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      reactions:
+        minimum: 0
+        type: integer
+      shares:
+        minimum: 0
+        type: integer
+      timestamp:
+        type: string
+      user_id:
+        type: string
+      views:
+        minimum: 0
+        type: integer
+    required:
+    - content
+    - hashtags
+    - id
+    - reactions
+    - shares
+    - timestamp
+    - user_id
+    - views
+    type: object
+  sentiment.SentimentAnalysis:
+    properties:
+      anomaly_detected:
+        type: boolean
+      anomaly_type:
+        $ref: '#/definitions/sentiment.AnomalyType-bool-string'
+      engagement_score:
+        type: number
+      flags:
+        $ref: '#/definitions/sentiment.SentimentAnalysisFlags'
+      sentiment_distribution:
+        $ref: '#/definitions/sentiment.SentimentDistribution'
+      trending_topics:
+        items:
+          type: string
+        type: array
+    type: object
+  sentiment.SentimentAnalysisFlags:
+    properties:
+      candidate_awareness:
+        type: boolean
+      mbras_employee:
+        type: boolean
+      special_pattern:
+        type: boolean
+    type: object
+  sentiment.SentimentDistribution:
+    properties:
+      negative:
+        type: number
+      neutral:
+        type: number
+      positive:
+        type: number
+    type: object
+info:
+  contact:
+    name: Guilherme Gonçalves
+    url: https://github.com/lwglg
+  description: RESTful API providing sentimnet analysis for feeds' messages
+  license:
+    name: MIT License
+    url: https://github.com/lwglg/gefuehlmesser/blob/main/LICENSE
+  title: Gefuehlmesser API
+  version: 1.0.0
+paths:
+  /api/v1/feeds/analyze:
+    post:
+      consumes:
+      - application/json
+      description: Realiza a análise determinística de sentimento das mensagens de
+        um feed, dada uma payload de feed válida.
+      parameters:
+      - description: Payload contendo as mensagens de feed e parâmetro de janela temporal.
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/sentiment.Feed'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sentiment.SentimentAnalysis'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/err.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/err.Errors'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/err.Error'
+      summary: Análise de sentimento
+      tags:
+      - API de feed
+  /utilitary/healthcheck:
+    get:
+      description: Realiza uma requisição de healthcheck ao servidor, retornnando
+        uma mensagem simples.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/healthcheck.HealthcheckData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/err.Error'
+      summary: Healthcheck
+      tags:
+      - API utilitária
+swagger: "2.0"

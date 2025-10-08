@@ -39,7 +39,8 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 		Message:   "I'm alive",
 	}
 
-	if err := json.NewEncoder(w).Encode(data); err != nil {
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
 		a.logger.Error().Str(l.KeyReqID, reqID).Err(err).Msg("Error while trasmitting healthcheck data")
 		e.ServerError(w, e.RespHealthCheckFailure)
 

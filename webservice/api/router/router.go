@@ -15,6 +15,7 @@ import (
 	"webservice/api/router/middleware"
 	"webservice/api/router/middleware/requestlog"
 
+	cfg "webservice/config"
 	docs "webservice/docs"
 	sa "webservice/libs/sentiment"
 )
@@ -45,10 +46,10 @@ func mountSentimentApi(r *chi.Mux, l *zerolog.Logger, v *validator.Validate, a *
 	})
 }
 
-func New(l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer) *chi.Mux {
+func New(l *zerolog.Logger, v *validator.Validate, a *sa.SentimentAnalyzer, c *cfg.Conf) *chi.Mux {
 	r := chi.NewRouter()
 
-	SetSwaggetInfo(docs.SwaggerInfo)
+	SetSwaggetInfo(docs.SwaggerInfo, c)
 
 	mountUtilitaryApi(r, l)
 	mountSentimentApi(r, l, v, a)

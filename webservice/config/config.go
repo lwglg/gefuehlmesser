@@ -8,7 +8,16 @@ import (
 )
 
 type Conf struct {
-	Server ConfServer
+	Server    ConfServer
+	SwaggerUI ConfSwaggerUI
+}
+
+type ConfSwaggerUI struct {
+	Title       string `env:"SWAGGER_UI_API_TITLE"`
+	Description string `env:"SWAGGER_UI_API_DESCRIPTION"`
+	Version     string `env:"SWAGGER_UI_API_VERSION"`
+	Host        string `env:"SWAGGER_UI_HOSTNAME"`
+	HttpSchemes string `env:"SWAGGER_UI_HTTP_SCHEMES"` // Comma-separated string, e.g. http,https
 }
 
 type ConfServer struct {

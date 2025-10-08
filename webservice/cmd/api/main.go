@@ -31,7 +31,7 @@ func main() {
 	l := logger.New(c.Server.Debug)
 	v := validator.New()
 	a := sentiment.New()
-	r := router.New(l, v, a)
+	r := router.New(l, v, a, c)
 
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),

@@ -59,3 +59,21 @@ func RoundFloatFast(f float64, precision int) (float64, error) {
 
 	return math.Round(product) / mul, roundingErr
 }
+
+func IsPrime(n int64) bool {
+	if n <= 1 || n%2 == 0 {
+		return false
+	}
+
+	if n == 2 {
+		return true
+	}
+
+	sqrt := int(math.Sqrt(float64(n)))
+	for i := 3; i <= sqrt; i += 2 {
+		if n%int64(i) == 0 {
+			return false
+		}
+	}
+	return true
+}

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	n "webservice/libs/numeric"
+	t "webservice/libs/tooling"
 )
 
 type SentimentAnalyzerMethods interface {
@@ -43,14 +44,14 @@ func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*Mes
 	negationScopes := []int{}
 
 	for _, item := range tokens {
-		if len(Filter(Intensifiers, func(v string) bool { return v == item.Normalized })) > 0 {
+		if t.HasAny(Intensifiers, func(v string) bool { return v == item.Normalized }) {
 			nextMultiplier = 1.5
 			negationScopes = DecreaseNegScopes(negationScopes)
 
 			continue
 		}
 
-		if len(Filter(Negations, func(v string) bool { return v == item.Normalized })) > 0 {
+		if t.HasAny(Negations, func(v string) bool { return v == item.Normalized }) {
 			negationScopes = append(negationScopes, 3)
 
 			continue
@@ -58,7 +59,7 @@ func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*Mes
 
 		polarity := 0
 
-		if len(Filter(PositiveWords, func(v string) bool { return v == item.Normalized })) > 0 {
+		if t.HasAny(PositiveWords, func(v string) bool { return v == item.Normalized }) {
 			polarity = 1
 		} else {
 			polarity = -1
@@ -113,13 +114,13 @@ func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*Mes
 }
 
 func (analyzer *SentimentAnalyzer) BuildFeedSentimentFlags(validMessages *[]FeedMessage) FeedSentimentFlags {
-	mBrasEmployee := len(Filter(*validMessages, func(v FeedMessage) bool { return IsMbrasEmployee(v.UserID) })) > 0
+	mBrasEmployee := t.HasAny(*validMessages, func(v FeedMessage) bool { return IsMbrasEmployee(v.UserID) })
 
-	specialPattern := len(Filter(*validMessages, func(v FeedMessage) bool {
+	specialPattern := t.HasAny(*validMessages, func(v FeedMessage) bool {
 		return len(v.Content) == 42 && strings.Contains(strings.ToLower(v.Content), "mbras")
-	})) > 0
+	})
 
-	candidateAwareness := len(Filter(*validMessages, func(v FeedMessage) bool { return CheckCandidateAwareneness(v.Content) })) > 0
+	candidateAwareness := t.HasAny(*validMessages, func(v FeedMessage) bool { return CheckCandidateAwareneness(v.Content) })
 
 	return FeedSentimentFlags{
 		CandidateAwareness: candidateAwareness,
@@ -143,7 +144,7 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 
 		if m.Sentiment.Label == "meta" {
 			// Apenas mensagens dentro da janela temporal contam para a distribuição
-			if len(Filter(*windowMessages, func(v FeedMessage) bool { return m.UserID == v.UserID && m.ID == v.ID })) > 0 {
+			if t.HasAny(*windowMessages, func(v FeedMessage) bool { return m.UserID == v.UserID && m.ID == v.ID }) {
 				counts[m.Sentiment.Label] += 1
 				includeForDist += 1
 			}

@@ -7,6 +7,9 @@ import (
 	"strings"
 
 	"golang.org/x/text/transform"
+
+	n "webservice/libs/numeric"
+	t "webservice/libs/tooling"
 )
 
 type UserInfluence struct {
@@ -18,7 +21,7 @@ type UserInfluence struct {
 
 func PerformFollowerSimulation(userId string) (int64, error) {
 	// Edge case de normalização unicode
-	normalizedId, _, err := transform.String(Normalizer, userId)
+	normalizedId, _, err := transform.String(t.Normalizer, userId)
 	if err != nil {
 		return 0, err
 	}
@@ -35,7 +38,7 @@ func PerformFollowerSimulation(userId string) (int64, error) {
 	}
 
 	// Simulação determinística padrão
-	userIdHex := HexDigestFromString(userId)
+	userIdHex := t.HexDigestFromString(userId)
 
 	parsedHex, err := strconv.ParseInt(userIdHex, 16, 0)
 	if err != nil {
@@ -45,7 +48,7 @@ func PerformFollowerSimulation(userId string) (int64, error) {
 	base := (parsedHex % 10000) + 100
 
 	if strings.HasSuffix(userId, "_prime") {
-		if IsPrime(base) {
+		if n.IsPrime(base) {
 			return base, nil
 		} else {
 			return base + 1, nil

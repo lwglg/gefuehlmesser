@@ -27,8 +27,7 @@ func New() *validator.Validate {
 		return name
 	})
 
-	validate.RegisterValidation("msg_id", isMessageIdValid)
-	validate.RegisterValidation("user_id", isUserIdValid)
+	validate.RegisterValidation("id_field", isIdFieldValid)
 	validate.RegisterValidation("datetime", isTimestampValid)
 
 	return validate
@@ -48,10 +47,8 @@ func ToErrResponse(err error) *ErrResponse {
 				resp.Errors[i] = fmt.Sprintf("O campo '%s' é obrigatório", err.Field())
 			case "max":
 				resp.Errors[i] = fmt.Sprintf("O campo '%s' deve ter um tamanho de no máximo %s caracteres", err.Field(), err.Param())
-			case "user_id":
-				resp.Errors[i] = fmt.Sprintf("O campo '%s' deve seguir o padrão 'user_XXX'", err.Field())
-			case "msg_id":
-				resp.Errors[i] = fmt.Sprintf("O campo '%s' deve seguir o padrão 'msg_XXX'", err.Field())
+			case "id_field":
+				resp.Errors[i] = fmt.Sprintf("O campo '%s' deve seguir o padrão '[user|msg|perf]_XXX'", err.Field())
 			case "datetime":
 				resp.Errors[i] = fmt.Sprintf("O campo '%s' deve seguir o formato RFC3339 'YYYY-MM-DDThh:mm:ssZ'", err.Field())
 			default:
@@ -71,12 +68,8 @@ func isRegexFieldValid(fl validator.FieldLevel, regexString string) bool {
 	return reg.MatchString(fl.Field().String())
 }
 
-func isUserIdValid(fl validator.FieldLevel) bool {
-	return isRegexFieldValid(fl, s.UserIdRegexString)
-}
-
-func isMessageIdValid(fl validator.FieldLevel) bool {
-	return isRegexFieldValid(fl, s.MessageIdRegexString)
+func isIdFieldValid(fl validator.FieldLevel) bool {
+	return isRegexFieldValid(fl, s.IdRegexString)
 }
 
 func isTimestampValid(fl validator.FieldLevel) bool {

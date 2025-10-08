@@ -35,18 +35,18 @@ var tests = []*testCase{
 		expected: "O campo 'timestamp' deve seguir o formato RFC3339 'YYYY-MM-DDThh:mm:ssZ'",
 	},
 	{
-		name: `user_id`,
+		name: `id_field`,
 		input: struct {
-			UserID string `json:"user_id" validate:"user_id"`
+			UserID string `json:"user_id" validate:"id_field"`
 		}{UserID: "thisisnotright"},
-		expected: "O campo 'user_id' deve seguir o padrão 'user_XXX'",
+		expected: "O campo 'user_id' deve seguir o padrão '[user|msg|perf]_XXX'",
 	},
 	{
 		name: `msg_id`,
 		input: struct {
-			ID string `json:"msg_id" validate:"msg_id"`
+			ID string `json:"msg_id" validate:"id_field"`
 		}{ID: "thisIsAlsoNotRight"},
-		expected: "O campo 'msg_id' deve seguir o padrão 'msg_XXX'",
+		expected: "O campo 'msg_id' deve seguir o padrão '[user|msg|perf]_XXX'",
 	},
 }
 

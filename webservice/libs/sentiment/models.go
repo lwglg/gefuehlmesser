@@ -2,27 +2,22 @@ package sentiment
 
 import "time"
 
-type AnomalyType[T, U any] struct {
-	Flag T `json:"flag"`
-	Type U `json:"type"`
-}
-
 type FeedMessage struct {
-	ID         string   `json:"id" validate:"required,msg_id"`
+	ID         string   `json:"id" validate:"required,id_field"`
 	Content    string   `json:"content" validate:"required,max=280"`
 	Timestamp  string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"`
-	UserID     string   `json:"user_id" validate:"required,user_id"`
+	UserID     string   `json:"user_id" validate:"required,id_field"`
 	Hashtags   []string `json:"hashtags" validate:"required"`
-	Reactions  int      `json:"reactions" validate:"required,gte=0"`
-	Shares     int      `json:"shares" validate:"required,gte=0"`
-	Views      int      `json:"views" validate:"required,gte=0"`
+	Reactions  int      `json:"reactions" validate:"gte=0"`
+	Shares     int      `json:"shares" validate:"gte=0"`
+	Views      int      `json:"views" validate:"gte=0"`
 	TimeWindow time.Time
 	Sentiment  MessageSentiment
 }
 
 type Feed struct {
 	Messages          []FeedMessage `json:"messages" validate:"required,dive,required"`
-	TimeWindowMinutes int           `json:"time_window_minutes" validate:"required,gte=0"`
+	TimeWindowMinutes int           `json:"time_window_minutes" validate:"gte=0"`
 }
 
 type FeedSentimentDistribution struct {
@@ -43,8 +38,9 @@ type ContentToken struct {
 }
 
 type MessageSentiment struct {
-	Score float64 `json:"score"`
-	Label string  `json:"label"`
+	Score            float64 `json:"score"`
+	Label            string  `json:"label"`
+	ProcessingTimeMs float64 `json:"processing_time_ms"`
 }
 
 type UserInfluenceRanking struct {
@@ -57,6 +53,15 @@ type FeedSentiment struct {
 	TrendingTopics        []string                  `json:"trending_topics"`
 	InfluenceRanking      []UserInfluenceRanking    `json:"influence_ranking"`
 	AnomalyDetected       bool                      `json:"anomaly_detected"`
-	AnomalyType           AnomalyType[bool, string] `json:"anomaly_type"`
+	AnomalyType           string                    `json:"anomaly_type"`
 	Flags                 FeedSentimentFlags        `json:"flags"`
+	ProcessingTimeMs      float64                   `json:"processing_time_ms"`
+}
+
+type FeedSentimentAnalysis struct {
+	Analysis FeedSentiment `json:"analysis"`
+}
+
+type MessageSentimentAnalysis struct {
+	Analysis MessageSentiment `json:"analysis"`
 }

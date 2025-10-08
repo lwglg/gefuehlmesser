@@ -2,15 +2,18 @@ package sentiment
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"time"
+
+	n "webservice/libs/numeric"
 )
 
 type SentimentAnalyzerMethods interface {
 	BuildFeedSentimentFlags(validMessages *[]FeedMessage, utcNow *time.Time) FeedSentimentFlags
 	BuildFeedSentimentDistribution(validMessages *[]FeedMessage, windowMessages *[]FeedMessage, utcNow *time.Time) (*FeedSentimentDistribution, error)
-	AnalyzeMessage(userId string) (*MessageSentiment, error)
-	AnalyzeFeed(feed *Feed) (*FeedSentiment, error)
+	AnalyzeMessage(userId string) (*MessageSentimentAnalysis, error)
+	AnalyzeFeed(feed *Feed) (*FeedSentimentAnalysis, error)
 }
 
 type SentimentAnalyzer struct{}
@@ -19,13 +22,19 @@ func New() *SentimentAnalyzer {
 	return &SentimentAnalyzer{}
 }
 
-func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*MessageSentiment, error) {
+func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*MessageSentimentAnalysis, error) {
+	start := time.Now()
+
 	if CheckCandidateAwareneness(feedMessage.Content) {
-		return &MessageSentiment{0.0, "meta"}, nil
+		elapsedMs := float64(time.Since(start)) / float64(time.Millisecond)
+
+		return &MessageSentimentAnalysis{
+			Analysis: MessageSentiment{0.0, "meta", elapsedMs},
+		}, nil
 	}
 
 	tokens := TokenizeContent(feedMessage.Content)
-	totalWords := max(len(tokens), 1)
+	totalWords := math.Max(float64(len(tokens)), 1)
 
 	label := ""
 	postivesSum := 0.0
@@ -91,7 +100,16 @@ func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*Mes
 		label = "neutral"
 	}
 
-	return &MessageSentiment{score, label}, nil
+	finish := time.Now()
+	diff := finish.Sub(start)
+	elapsedMs, err := n.TruncFloat(diff.Seconds()*1000, 4)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MessageSentimentAnalysis{
+		Analysis: MessageSentiment{score, label, elapsedMs},
+	}, nil
 }
 
 func (analyzer *SentimentAnalyzer) BuildFeedSentimentFlags(validMessages *[]FeedMessage) FeedSentimentFlags {
@@ -117,10 +135,11 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 	for _, m := range *validMessages {
 		sentiment, err := analyzer.AnalyzeMessage(m)
 		if err != nil {
+			fmt.Println("Erro ao analisar o sentimento da mensagem")
 			return nil, err
 		}
 
-		m.Sentiment = *sentiment
+		m.Sentiment = (*sentiment).Analysis
 
 		if m.Sentiment.Label == "meta" {
 			// Apenas mensagens dentro da janela temporal contam para a distribuição
@@ -151,20 +170,15 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 	return &distribution, nil
 }
 
-func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentiment, error) {
-	utcNow := time.Now().UTC()
-
-	fmt.Println(feed.TimeWindowMinutes)
-	fmt.Println(utcNow.String())
+func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalysis, error) {
+	start := time.Now()
+	utcNow := start.UTC()
 
 	validMessages, windowMessages, err := ExtractMessages(&feed.Messages, &utcNow, &feed.TimeWindowMinutes)
 	if err != nil {
 		fmt.Println("Erro ao extrair mensagens válidas e de janela temporal!")
 		return nil, err
 	}
-
-	fmt.Printf("LEN windowMessages %d \n", len(windowMessages))
-	fmt.Printf("LEN validMessages %d \n", len(validMessages))
 
 	sentimentDistribution, err := analyzer.BuildFeedSentimentDistribution(&validMessages, &windowMessages)
 	if err != nil {
@@ -173,8 +187,11 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentiment, erro
 	}
 
 	sentimentFlags := analyzer.BuildFeedSentimentFlags(&validMessages)
+
 	trendingTopics := ExtractTrendingTopics(&windowMessages, &utcNow)
+
 	engagementScore := EvaluateGlobalEngagement(&windowMessages, &sentimentFlags)
+
 	influenceRanking, err := EvaluateInfluenceRanking(&windowMessages)
 	if err != nil {
 		fmt.Println("Erro ao calcular o ranking de influência por usuário!")
@@ -182,9 +199,12 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentiment, erro
 	}
 
 	anomalyFlag, anomalyType := DetectAnomalies(&feed.Messages)
-	anomaly := AnomalyType[bool, string]{
-		Flag: anomalyFlag,
-		Type: *anomalyType,
+
+	finish := time.Now()
+	diff := finish.Sub(start)
+	elapsedMs, err := n.TruncFloat(diff.Seconds()*1000, 4)
+	if err != nil {
+		return nil, err
 	}
 
 	analysis := FeedSentiment{
@@ -193,9 +213,12 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentiment, erro
 		TrendingTopics:        trendingTopics,
 		InfluenceRanking:      influenceRanking,
 		AnomalyDetected:       anomalyFlag,
-		AnomalyType:           anomaly,
+		AnomalyType:           anomalyType,
 		Flags:                 sentimentFlags,
+		ProcessingTimeMs:      elapsedMs,
 	}
 
-	return &analysis, nil
+	return &FeedSentimentAnalysis{
+		Analysis: analysis,
+	}, nil
 }

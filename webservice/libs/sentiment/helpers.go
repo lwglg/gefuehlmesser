@@ -15,17 +15,15 @@ import (
 	"golang.org/x/text/runes"
 )
 
-type Message map[string]interface{}
-
 var Normalizer = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 
-func StripAccentsLower(str string) (string, error) {
-	s, _, err := transform.String(Normalizer, str)
+func StripAccentsLower(content string) (string, error) {
+	result, _, err := transform.String(Normalizer, content)
 	if err != nil {
 		return "", err
 	}
 
-	return strings.ToLower(s), err
+	return strings.ToLower(result), nil
 }
 
 func HexDigestFromString(text string) string {
@@ -93,11 +91,7 @@ func CheckCandidateAwareneness(content string, referenceStr ...string) bool {
 		reference = referenceStr[0]
 	}
 
-	re := regexp.MustCompile(PunctuationRegexString)
-	norm := strings.Trim(re.ReplaceAllString(" ", content), " ")
-	norm = regexp.MustCompile(`\s+`).ReplaceAllString(" ", norm)
-
-	strippedNorm, _ := StripAccentsLower(norm)
+	strippedNorm, _ := StripAccentsLower(content)
 	strippedRef, _ := StripAccentsLower(reference)
 
 	return strippedNorm == strippedRef

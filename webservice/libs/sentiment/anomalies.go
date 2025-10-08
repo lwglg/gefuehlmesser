@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-func DetectAnomalies(allMsgs *[]FeedMessage) (bool, *string) {
+func DetectAnomalies(allMsgs *[]FeedMessage) (bool, string) {
 	countMsgs := len(*allMsgs)
 
 	if countMsgs == 0 {
-		return false, nil
+		return false, ""
 	}
 
 	// Synchronized posting tolerant: at least 3 messages and all within ±2 seconds
@@ -35,7 +35,7 @@ func DetectAnomalies(allMsgs *[]FeedMessage) (bool, *string) {
 		if maxSec.Sub(minSec) <= 2*time.Second {
 			result := "synchronized_posting"
 
-			return true, &result
+			return true, result
 		}
 	}
 
@@ -55,18 +55,17 @@ func DetectAnomalies(allMsgs *[]FeedMessage) (bool, *string) {
 
 		i := 0
 
-		for j := 0; j < len(tsList); j++ {
+		for j := range tsList {
 			for tsList[j].Sub(tsList[i]) > 5*time.Minute {
 				i++
 			}
 
 			if (j - i + 1) > 10 {
 				result := "burst"
-
-				return true, &result
+				return true, result
 			}
 		}
 	}
 
-	return false, nil
+	return false, ""
 }

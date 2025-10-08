@@ -1,4 +1,4 @@
-name: Image Analysis
+name: Imagem Docker
 
 on:
   pull_request:

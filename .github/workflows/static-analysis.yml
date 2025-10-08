@@ -1,4 +1,4 @@
-name: Static Analysis
+name: Análise Estática
 
 on:
   pull_request:

@@ -187,22 +187,10 @@ const docTemplate = `{
                 }
             }
         },
-        "sentiment.AnomalyType-bool-string": {
-            "type": "object",
-            "properties": {
-                "flag": {
-                    "type": "boolean"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
         "sentiment.Feed": {
             "type": "object",
             "required": [
-                "messages",
-                "time_window_minutes"
+                "messages"
             ],
             "properties": {
                 "messages": {
@@ -223,11 +211,8 @@ const docTemplate = `{
                 "content",
                 "hashtags",
                 "id",
-                "reactions",
-                "shares",
                 "timestamp",
-                "user_id",
-                "views"
+                "user_id"
             ],
             "properties": {
                 "content": {
@@ -276,7 +261,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "anomaly_type": {
-                    "$ref": "#/definitions/sentiment.AnomalyType-bool-string"
+                    "type": "string"
                 },
                 "engagement_score": {
                     "type": "number"
@@ -289,6 +274,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/sentiment.UserInfluenceRanking"
                     }
+                },
+                "processing_time_ms": {
+                    "type": "number"
                 },
                 "sentiment_distribution": {
                     "$ref": "#/definitions/sentiment.FeedSentimentDistribution"
@@ -334,6 +322,9 @@ const docTemplate = `{
             "properties": {
                 "label": {
                     "type": "string"
+                },
+                "processing_time_ms": {
+                    "type": "number"
                 },
                 "score": {
                     "type": "number"

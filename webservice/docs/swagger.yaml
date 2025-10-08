@@ -20,13 +20,6 @@ definitions:
       status_code:
         type: integer
     type: object
-  sentiment.AnomalyType-bool-string:
-    properties:
-      flag:
-        type: boolean
-      type:
-        type: string
-    type: object
   sentiment.Feed:
     properties:
       messages:
@@ -38,7 +31,6 @@ definitions:
         type: integer
     required:
     - messages
-    - time_window_minutes
     type: object
   sentiment.FeedMessage:
     properties:
@@ -72,18 +64,15 @@ definitions:
     - content
     - hashtags
     - id
-    - reactions
-    - shares
     - timestamp
     - user_id
-    - views
     type: object
   sentiment.FeedSentiment:
     properties:
       anomaly_detected:
         type: boolean
       anomaly_type:
-        $ref: '#/definitions/sentiment.AnomalyType-bool-string'
+        type: string
       engagement_score:
         type: number
       flags:
@@ -92,6 +81,8 @@ definitions:
         items:
           $ref: '#/definitions/sentiment.UserInfluenceRanking'
         type: array
+      processing_time_ms:
+        type: number
       sentiment_distribution:
         $ref: '#/definitions/sentiment.FeedSentimentDistribution'
       trending_topics:
@@ -121,6 +112,8 @@ definitions:
     properties:
       label:
         type: string
+      processing_time_ms:
+        type: number
       score:
         type: number
     type: object

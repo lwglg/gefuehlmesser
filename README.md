@@ -12,11 +12,12 @@ Avaliação técnica para a posição de desenvolvedor de software na [MBRAS Emp
   - [1.1. TOC](#11-toc)
   - [1.2. Preliminares](#12-preliminares)
   - [1.3. Topologia do projeto (WiP)](#13-topologia-do-projeto-wip)
-  - [1.4. Manipulação do projeto](#14-manipulação-do-projeto)
-    - [1.4.1. Startup](#141-startup)
-    - [1.4.2. Shutdown](#142-shutdown)
-  - [1.5. TL;DR](#15-tldr)
-  - [1.6. O que deseja fazer?](#16-o-que-deseja-fazer)
+  - [1.4. Cálculo de sentimentos](#14-cálculo-de-sentimentos)
+  - [1.5. Manipulação do projeto](#15-manipulação-do-projeto)
+    - [1.5.1. Startup](#151-startup)
+    - [1.5.2. Shutdown](#152-shutdown)
+  - [1.6. TL;DR](#16-tldr)
+  - [1.7. O que deseja fazer?](#17-o-que-deseja-fazer)
 
 
 ## 1.2. Preliminares
@@ -52,8 +53,42 @@ Em linhas gerais, o projeto é composto de:
 
 ![Topologia](./resources/docs/images/docker-topology.png)
 
+> [!NOTE]
+> Para gerar ou atualizar o diagrama acima, basta executar na raíz do projeto o comando `make topology`.
 
-## 1.4. Manipulação do projeto
+Associado ao manifesto do Docker Compose, o serviço declarado é
+
+ **Serviço**            | **Descrição**                                                       | **Portas expostas** | **URL base externa**    | **URL base interna**              |
+|-----------------------|---------------------------------------------------------------------|---------------------|-------------------------|-----------------------------------|
+| `webservice`          | Servidor de aplicação (Go) que fornece a API RESTful                | 8080 (TCP,HTTP)     | `http://localhost:8080` | `http://webservice:8080`          |
+
+> [!IMPORTANT]
+> Concernindo as URLs supracitadas, as **externas** são classificadas assim pois são **externas à rede do Docker**, e.g. quando a aplicação Fastify está sendo rodada localmente na máquina.
+> 
+> Similarmente, uma URL é dita **interna** pois é **interna à rede do Docker**, e.g. quando tanto o app Fastify quanto o servidor PostgreSQL estão rodando em seus contêineres, se comunicando via TCP.
+
+
+## 1.4. Cálculo de sentimentos
+
+Com base nas [especificações](https://github.com/MBRAS-Emprendimentos/backend-challenge-092025/blob/main/docs/algorithm_examples.md) do teste técnico, o modelo determinístico para o cálculo de sentimentos de mensagens de feed foi implementado como uma biblioteca, em `./webservices/libs/sentiment`, seguindo a estrutura abaixo:
+
+```bash
+./webservice/libs
+├── ... # Demais bibliotecas
+├── sentiment
+│   ├── analyzer.go         # Onde se encontram os métodos principais para cálculo de sentimentos para feed e para uma mensagem isolada
+│   ├── anomalies.go        # Função auxiliar para detecção de anomalias (várias mensagens dentro de uma janela de 2s), com base em todas as mensagens do feed
+│   ├── definitions.go      # Declarações de constantes comuns a todos os módulos da lib
+│   ├── engagement.go       # Funções auxiliares para o cálculo do escore de engajamento e de influência que as mensagens causaram, para todos os usuários no feed
+│   ├── helpers.go          # Funções auxiliares comuns aos demais módulos da lib, e.g. remoção de acentos e tokenização de mensagens, validaçòes de data/hora
+│   ├── models.go           # Declarações de tipos de I/O mais complexos, utilizados nas assinaturas de funções
+│   └── trending_topics.go  # Função auxiliar para a extração das "trending topics" (tópicos com engajamento mais notável) dentre as mensagens do feed
+```
+
+> [!IMPORTANT]
+> Por questões de restrição de tempo, não foram conduzidos testes exploratórios mais extensos da API e, por extensão, da biblioteca em questão. Entretanto, ambos pode ser considerados funcionais.
+
+## 1.5. Manipulação do projeto
 
 Através do `make`, via scripts de automação do Docker Compose implementados em um [Makefile](./Makefile), na raíz do projeto. Para conferir a documentação de cada script, basta executar no terminal
 
@@ -62,7 +97,7 @@ make                                # Sem nenhum comando, executa o fallback 'he
 make help                           # Explicitamente, mostra a documentação
 ```
 
-### 1.4.1. Startup
+### 1.5.1. Startup
 
 Considerando uma instalação inicial, na raíz do projeto, execute os seguintes comandos:
 
@@ -84,11 +119,9 @@ $ make init c=webservice         # Inicia o container do serviço `webservice`, 
 > A documentação da API RESTful pode ser acessada pela Swagger UI, via browser, através da URL [`http://localhost:8080/api/v1/swagger`](http://localhost:8080/api/v1/swagger/index.html#/)
 > 
 > De modo a conduzir testes exploratórios na API RESTful, foram criados uma _collection_ e um _environment_ do Postman. Ambos se encontram em [`./resources/testing`](./resources/testing/)
->
-> 
+ 
 
-
-### 1.4.2. Shutdown
+### 1.5.2. Shutdown
 
 Similarmente, para ambos os ambientes, de modo a encerrar a execução de todos os contêineres, basta rodar:
 
@@ -97,7 +130,7 @@ make stop          # Interrompe os contêineres que estiverem sendo executados
 make clean         # Opcional. Remove os contêineres e a network associadas aos serviços do ambiente
 ```
 
-## 1.5. TL;DR
+## 1.6. TL;DR
 
 Entre em contato com o desenvolvedor do projeto:
 
@@ -107,6 +140,6 @@ Entre em contato com o desenvolvedor do projeto:
 
 ---
 
-## 1.6. O que deseja fazer?
+## 1.7. O que deseja fazer?
 
 - [Voltar ao topo](#11-toc)

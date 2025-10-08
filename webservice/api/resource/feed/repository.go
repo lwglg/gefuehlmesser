@@ -14,7 +14,7 @@ func NewRepository(analyzer *sa.SentimentAnalyzer) *Repository {
 	}
 }
 
-func (r *Repository) AnalyzeFeed(feed *sa.Feed) (*sa.FeedSentiment, error) {
+func (r *Repository) AnalyzeFeed(feed *sa.Feed) (*sa.FeedSentimentAnalysis, error) {
 	analysis, err := r.analyzer.AnalyzeFeed(feed)
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (r *Repository) AnalyzeFeed(feed *sa.Feed) (*sa.FeedSentiment, error) {
 	return analysis, nil
 }
 
-func (r *Repository) AnalyzeMessage(feedMessage *sa.FeedMessage) (*sa.MessageSentiment, error) {
+func (r *Repository) AnalyzeMessage(feedMessage *sa.FeedMessage) (*sa.MessageSentimentAnalysis, error) {
 	sentiment, err := r.analyzer.AnalyzeMessage(*feedMessage)
 	if err != nil {
 		return nil, err

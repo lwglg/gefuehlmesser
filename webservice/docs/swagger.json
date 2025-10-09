@@ -220,6 +220,9 @@
                 "id": {
                     "type": "string"
                 },
+                "parsedTimeStamp": {
+                    "type": "string"
+                },
                 "reactions": {
                     "type": "integer",
                     "minimum": 0
@@ -230,9 +233,6 @@
                 "shares": {
                     "type": "integer",
                     "minimum": 0
-                },
-                "timeWindow": {
-                    "type": "string"
                 },
                 "timestamp": {
                     "type": "string"

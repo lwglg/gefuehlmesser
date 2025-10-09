@@ -228,6 +228,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "parsedTimeStamp": {
+                    "type": "string"
+                },
                 "reactions": {
                     "type": "integer",
                     "minimum": 0
@@ -238,9 +241,6 @@ const docTemplate = `{
                 "shares": {
                     "type": "integer",
                     "minimum": 0
-                },
-                "timeWindow": {
-                    "type": "string"
                 },
                 "timestamp": {
                     "type": "string"

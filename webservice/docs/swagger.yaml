@@ -43,6 +43,8 @@ definitions:
         type: array
       id:
         type: string
+      parsedTimeStamp:
+        type: string
       reactions:
         minimum: 0
         type: integer
@@ -51,8 +53,6 @@ definitions:
       shares:
         minimum: 0
         type: integer
-      timeWindow:
-        type: string
       timestamp:
         type: string
       user_id:

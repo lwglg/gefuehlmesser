@@ -76,9 +76,10 @@ func EvaluateUserEngagementRate(reactions, shares, views int) float64 {
 	return baseRate
 }
 
-func EvaluateGlobalEngagement(windowMessages *[]FeedMessage, sentimentFlags *FeedSentimentFlags) float64 {
+func EvaluateGlobalEngagement(windowMessages *[]FeedMessage, sentimentFlags *FeedSentimentFlags) (*float64, error) {
 	sumReactionsShares := 0.0
 	sumViews := 0.0
+	score := 0.0
 
 	for _, m := range *windowMessages {
 		sumReactionsShares += float64(m.Reactions) + float64(m.Shares)
@@ -87,10 +88,17 @@ func EvaluateGlobalEngagement(windowMessages *[]FeedMessage, sentimentFlags *Fee
 
 	// Caso especial da especificação do teste
 	if sentimentFlags.CandidateAwareness {
-		return 9.42
+		score = 9.42
+		return &score, nil
 	}
 
-	return 10.0 * (sumReactionsShares / math.Max(sumViews, 1))
+	score, err := t.TruncFloat(10.0*(sumReactionsShares/math.Max(sumViews, 1)), 4)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &score, nil
 }
 
 func EvaluateInfluenceRanking(windowMsgs *[]FeedMessage) ([]UserInfluenceRanking, error) {
@@ -155,9 +163,15 @@ func EvaluateInfluenceRanking(windowMsgs *[]FeedMessage) ([]UserInfluenceRanking
 	influenceRanking := make([]UserInfluenceRanking, 0, 10)
 
 	for i := 0; i < 10 && i < len(ranking); i++ {
+		score, err := t.TruncFloat(ranking[i][0].(float64), 4)
+
+		if err != nil {
+			return nil, err
+		}
+
 		influenceRanking = append(influenceRanking, UserInfluenceRanking{
 			UserID:         ranking[i][2].(string),
-			InfluenceScore: ranking[i][0].(float64),
+			InfluenceScore: score,
 		})
 	}
 

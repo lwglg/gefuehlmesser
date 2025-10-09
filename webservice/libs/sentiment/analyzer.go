@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	n "webservice/libs/numeric"
 	t "webservice/libs/tooling"
 )
 
@@ -103,7 +102,7 @@ func (analyzer *SentimentAnalyzer) AnalyzeMessage(feedMessage FeedMessage) (*Mes
 
 	finish := time.Now()
 	diff := finish.Sub(start)
-	elapsedMs, err := n.TruncFloat(diff.Seconds()*1000, 4)
+	elapsedMs, err := t.TruncFloat(diff.Seconds()*1000, 4)
 	if err != nil {
 		return nil, err
 	}
@@ -142,9 +141,9 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 
 		m.Sentiment = (*sentiment).Analysis
 
-		if m.Sentiment.Label == "meta" {
+		if m.Sentiment.Label != "meta" {
 			// Apenas mensagens dentro da janela temporal contam para a distribuição
-			if t.HasAny(*windowMessages, func(v FeedMessage) bool { return m.UserID == v.UserID && m.ID == v.ID }) {
+			if t.HasAny(*windowMessages, func(v FeedMessage) bool { return m.ID == v.ID }) {
 				counts[m.Sentiment.Label] += 1
 				includeForDist += 1
 			}
@@ -161,10 +160,21 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 			Neutral:  0.0,
 		}
 	} else {
+		for label, count := range counts {
+			percentage, err := t.TruncFloat(100.0*count/float64(includeForDist), 4)
+
+			if err != nil {
+				return nil, err
+			}
+
+			key := label + "_percentage"
+			counts[key] = percentage
+		}
+
 		distribution = FeedSentimentDistribution{
-			Positive: 100.0 * counts["positive"] / float64(includeForDist),
-			Negative: 100.0 * counts["negative"] / float64(includeForDist),
-			Neutral:  100.0 * counts["neutral"] / float64(includeForDist),
+			Positive: counts["positive_percentage"],
+			Negative: counts["negative_percentage"],
+			Neutral:  counts["neutral_percentage"],
 		}
 	}
 
@@ -181,8 +191,6 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalys
 		return nil, err
 	}
 
-	fmt.Println("\t\twindowMessage:", len(windowMessages), "validMessages:", len(validMessages))
-
 	sentimentDistribution, err := analyzer.BuildFeedSentimentDistribution(&validMessages, &windowMessages)
 	if err != nil {
 		fmt.Println("Erro ao gerar distribuição de sentimentos!")
@@ -191,11 +199,16 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalys
 
 	sentimentFlags := analyzer.BuildFeedSentimentFlags(&validMessages)
 	trendingTopics := ExtractTrendingTopics(&windowMessages, &utcNow)
-	engagementScore := EvaluateGlobalEngagement(&windowMessages, &sentimentFlags)
+
+	engagementScore, err := EvaluateGlobalEngagement(&windowMessages, &sentimentFlags)
+	if err != nil {
+		fmt.Println("Erro ao calcular o score de engajamento")
+		return nil, err
+	}
 
 	influenceRanking, err := EvaluateInfluenceRanking(&windowMessages)
 	if err != nil {
-		// fmt.Println("Erro ao calcular o ranking de influência por usuário!")
+		fmt.Println("Erro ao calcular o ranking de influência por usuário!")
 		return nil, err
 	}
 
@@ -203,14 +216,14 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalys
 
 	finish := time.Now()
 	diff := finish.Sub(start)
-	elapsedMs, err := n.TruncFloat(diff.Seconds()*1000, 4)
+	elapsedMs, err := t.TruncFloat(diff.Seconds()*1000, 4)
 	if err != nil {
 		return nil, err
 	}
 
 	analysis := FeedSentiment{
 		SentimentDistribution: *sentimentDistribution,
-		EngagementScore:       engagementScore,
+		EngagementScore:       *engagementScore,
 		TrendingTopics:        trendingTopics,
 		InfluenceRanking:      influenceRanking,
 		AnomalyDetected:       anomalyFlag,

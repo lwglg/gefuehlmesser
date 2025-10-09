@@ -2,24 +2,36 @@ package sentiment
 
 import "time"
 
+// FeedMessage
+//
+// @description    Estrutura de uma típica mensagem,
+// @description    associada a um feed de usuário
 type FeedMessage struct {
-	ID              string   `json:"id" validate:"required,id_field"`
-	Content         string   `json:"content" validate:"required,max=280"`
-	Timestamp       string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"`
-	UserID          string   `json:"user_id" validate:"required,id_field"`
-	Hashtags        []string `json:"hashtags" validate:"required"`
-	Reactions       int      `json:"reactions" validate:"gte=0"`
-	Shares          int      `json:"shares" validate:"gte=0"`
-	Views           int      `json:"views" validate:"gte=0"`
+	ID              string   `json:"id" validate:"required,id_field"`                             // O ID da mensagem, e.g. msg_123
+	Content         string   `json:"content" validate:"required,max=280"`                         // O conteúdo textual da mensagem
+	Timestamp       string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"` // Data/hora local, em formato UTC (GMT - ZULU Time)
+	UserID          string   `json:"user_id" validate:"required,id_field"`                        // ID do usuário ao qual a mensagem está associada, e.g. user_324
+	Hashtags        []string `json:"hashtags" validate:"required"`                                // Lista de hashtags associadas às mensagens do feed
+	Reactions       int      `json:"reactions" validate:"gte=0"`                                  // Total de reações a mensagem
+	Shares          int      `json:"shares" validate:"gte=0"`                                     // Total de cxompartilhamentos da mensagem
+	Views           int      `json:"views" validate:"gte=0"`                                      // Total de visualizações da mensagem
 	ParsedTimeStamp time.Time
 	Sentiment       MessageSentiment
 }
 
+// Feed
+//
+// @description    Estrutura do feed de mensagens,
+// @description    associados a um usuário
 type Feed struct {
-	Messages          []FeedMessage `json:"messages" validate:"required,dive,required"`
-	TimeWindowMinutes int           `json:"time_window_minutes" validate:"gte=0"`
+	Messages          []FeedMessage `json:"messages" validate:"required,dive,required"` // A lista de mensagem para aquele feed
+	TimeWindowMinutes int           `json:"time_window_minutes" validate:"gte=0"`       // A janela de tempo, em minutos, na qual serão consideradas mensagens para a análise de sentimentos
 }
 
+// FeedSentimentDistribution
+//
+// @description    Contém o percentual de mensagem
+// @description    message feed.
 type FeedSentimentDistribution struct {
 	Positive float64 `json:"positive"`
 	Negative float64 `json:"negative"`

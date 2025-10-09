@@ -21,43 +21,56 @@ definitions:
         type: integer
     type: object
   sentiment.Feed:
+    description: Estrutura do feed de mensagens, associados a um usuário
     properties:
       messages:
+        description: A lista de mensagem para aquele feed
         items:
           $ref: '#/definitions/sentiment.FeedMessage'
         type: array
       time_window_minutes:
+        description: A janela de tempo, em minutos, na qual serão consideradas mensagens
+          para a análise de sentimentos
         minimum: 0
         type: integer
     required:
     - messages
     type: object
   sentiment.FeedMessage:
+    description: Estrutura de uma típica mensagem, associada a um feed de usuário
     properties:
       content:
+        description: O conteúdo textual da mensagem
         maxLength: 280
         type: string
       hashtags:
+        description: Lista de hashtags associadas às mensagens do feed
         items:
           type: string
         type: array
       id:
+        description: O ID da mensagem, e.g. msg_123
         type: string
       parsedTimeStamp:
         type: string
       reactions:
+        description: Total de reações a mensagem
         minimum: 0
         type: integer
       sentiment:
         $ref: '#/definitions/sentiment.MessageSentiment'
       shares:
+        description: Total de cxompartilhamentos da mensagem
         minimum: 0
         type: integer
       timestamp:
+        description: Data/hora local, em formato UTC (GMT - ZULU Time)
         type: string
       user_id:
+        description: ID do usuário ao qual a mensagem está associada, e.g. user_324
         type: string
       views:
+        description: Total de visualizações da mensagem
         minimum: 0
         type: integer
     required:
@@ -91,6 +104,7 @@ definitions:
         type: array
     type: object
   sentiment.FeedSentimentDistribution:
+    description: Contém o percentual de mensagem message feed.
     properties:
       negative:
         type: number

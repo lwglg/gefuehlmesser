@@ -180,24 +180,28 @@
             }
         },
         "sentiment.Feed": {
+            "description": "Estrutura do feed de mensagens, associados a um usuário",
             "type": "object",
             "required": [
                 "messages"
             ],
             "properties": {
                 "messages": {
+                    "description": "A lista de mensagem para aquele feed",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/sentiment.FeedMessage"
                     }
                 },
                 "time_window_minutes": {
+                    "description": "A janela de tempo, em minutos, na qual serão consideradas mensagens para a análise de sentimentos",
                     "type": "integer",
                     "minimum": 0
                 }
             }
         },
         "sentiment.FeedMessage": {
+            "description": "Estrutura de uma típica mensagem, associada a um feed de usuário",
             "type": "object",
             "required": [
                 "content",
@@ -208,22 +212,26 @@
             ],
             "properties": {
                 "content": {
+                    "description": "O conteúdo textual da mensagem",
                     "type": "string",
                     "maxLength": 280
                 },
                 "hashtags": {
+                    "description": "Lista de hashtags associadas às mensagens do feed",
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
                 "id": {
+                    "description": "O ID da mensagem, e.g. msg_123",
                     "type": "string"
                 },
                 "parsedTimeStamp": {
                     "type": "string"
                 },
                 "reactions": {
+                    "description": "Total de reações a mensagem",
                     "type": "integer",
                     "minimum": 0
                 },
@@ -231,16 +239,20 @@
                     "$ref": "#/definitions/sentiment.MessageSentiment"
                 },
                 "shares": {
+                    "description": "Total de cxompartilhamentos da mensagem",
                     "type": "integer",
                     "minimum": 0
                 },
                 "timestamp": {
+                    "description": "Data/hora local, em formato UTC (GMT - ZULU Time)",
                     "type": "string"
                 },
                 "user_id": {
+                    "description": "ID do usuário ao qual a mensagem está associada, e.g. user_324",
                     "type": "string"
                 },
                 "views": {
+                    "description": "Total de visualizações da mensagem",
                     "type": "integer",
                     "minimum": 0
                 }
@@ -282,6 +294,7 @@
             }
         },
         "sentiment.FeedSentimentDistribution": {
+            "description": "Contém o percentual de mensagem message feed.",
             "type": "object",
             "properties": {
                 "negative": {

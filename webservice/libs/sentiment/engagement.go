@@ -93,7 +93,6 @@ func EvaluateGlobalEngagement(windowMessages *[]FeedMessage, sentimentFlags *Fee
 	}
 
 	score, err := t.TruncFloat(10.0*(sumReactionsShares/math.Max(sumViews, 1)), 4)
-
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +163,6 @@ func EvaluateInfluenceRanking(windowMsgs *[]FeedMessage) ([]UserInfluenceRanking
 
 	for i := 0; i < 10 && i < len(ranking); i++ {
 		score, err := t.TruncFloat(ranking[i][0].(float64), 4)
-
 		if err != nil {
 			return nil, err
 		}

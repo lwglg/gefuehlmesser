@@ -162,7 +162,6 @@ func (analyzer *SentimentAnalyzer) BuildFeedSentimentDistribution(validMessages 
 	} else {
 		for label, count := range counts {
 			percentage, err := t.TruncFloat(100.0*count/float64(includeForDist), 4)
-
 			if err != nil {
 				return nil, err
 			}

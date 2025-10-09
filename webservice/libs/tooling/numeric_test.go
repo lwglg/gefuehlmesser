@@ -1,10 +1,10 @@
-package numeric_test
+package tooling_test
 
 import (
 	"testing"
 	"time"
 
-	n "webservice/libs/numeric"
+	n "webservice/libs/tooling"
 )
 
 func TestRoundFloatFast(t *testing.T) {

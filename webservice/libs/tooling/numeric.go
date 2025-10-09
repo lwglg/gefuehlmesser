@@ -1,4 +1,4 @@
-package numeric
+package tooling
 
 import (
 	"fmt"

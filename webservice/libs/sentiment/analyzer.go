@@ -181,6 +181,8 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalys
 		return nil, err
 	}
 
+	fmt.Println("\t\twindowMessage:", len(windowMessages), "validMessages:", len(validMessages))
+
 	sentimentDistribution, err := analyzer.BuildFeedSentimentDistribution(&validMessages, &windowMessages)
 	if err != nil {
 		fmt.Println("Erro ao gerar distribuição de sentimentos!")
@@ -188,14 +190,12 @@ func (analyzer *SentimentAnalyzer) AnalyzeFeed(feed *Feed) (*FeedSentimentAnalys
 	}
 
 	sentimentFlags := analyzer.BuildFeedSentimentFlags(&validMessages)
-
 	trendingTopics := ExtractTrendingTopics(&windowMessages, &utcNow)
-
 	engagementScore := EvaluateGlobalEngagement(&windowMessages, &sentimentFlags)
 
 	influenceRanking, err := EvaluateInfluenceRanking(&windowMessages)
 	if err != nil {
-		fmt.Println("Erro ao calcular o ranking de influência por usuário!")
+		// fmt.Println("Erro ao calcular o ranking de influência por usuário!")
 		return nil, err
 	}
 

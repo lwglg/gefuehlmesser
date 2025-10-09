@@ -25,7 +25,7 @@ func ExtractTrendingTopics(windowMsgs *[]FeedMessage, utcNow *time.Time) []strin
 		for _, h := range m.Hashtags {
 			tag := strings.ToLower(h)
 
-			dt := m.TimeWindow
+			dt := m.ParsedTimeStamp
 			deltaMin := (*utcNow).Sub(dt).Minutes()
 
 			if deltaMin < 0 {

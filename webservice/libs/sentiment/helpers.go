@@ -1,6 +1,7 @@
 package sentiment
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -14,11 +15,14 @@ func FilterFuture(messages []FeedMessage, nowUtc time.Time) ([]FeedMessage, erro
 	for _, message := range messages {
 		ts, err := time.Parse(time.RFC3339, message.Timestamp)
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 
-		if ts.Before(nowUtc.Add(5*time.Second)) || ts.Equal(nowUtc.Add(5*time.Second)) {
-			message.TimeWindow = ts
+		delta := nowUtc.Add(5 * time.Second)
+
+		if ts.Before(delta) || ts.Equal(delta) {
+			message.ParsedTimeStamp = ts
 			result = append(result, message)
 		}
 	}
@@ -27,9 +31,26 @@ func FilterFuture(messages []FeedMessage, nowUtc time.Time) ([]FeedMessage, erro
 }
 
 func IsMsgWithinWindow(m FeedMessage, utcNow time.Time, minutes int) bool {
-	dt := m.TimeWindow
+	// Incoming message parsed timestamp (already at ZULU)
+	dt := m.ParsedTimeStamp
 
-	return dt.After(utcNow.Add(-time.Duration(minutes)*time.Minute)) && (dt.Equal(utcNow) || dt.Before(utcNow))
+	timeWindowDelta := -time.Duration(minutes) * time.Minute
+	lowerLimit := utcNow.Add(timeWindowDelta)
+	upperLimit := utcNow
+
+	// Perform filtering (including interval extremes)
+	result := t.InTimeSpanEx(lowerLimit, upperLimit, dt, true, true)
+
+	if !result {
+		fmt.Println("timeWindowDelta:", timeWindowDelta)
+		fmt.Println("dtString", m.ParsedTimeStamp.String())
+		fmt.Println("dtToCheck:", dt)
+		fmt.Println("lowerLimit:", lowerLimit)
+		fmt.Println("upperLimit:", upperLimit)
+		fmt.Println("isWithinWindow:", result)
+	}
+
+	return result
 }
 
 func CheckCandidateAwareneness(content string, referenceStr ...string) bool {

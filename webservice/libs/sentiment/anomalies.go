@@ -16,7 +16,7 @@ func DetectAnomalies(allMsgs *[]FeedMessage) (bool, string) {
 	if countMsgs >= 3 {
 		secs := make([]time.Time, countMsgs)
 		for i, m := range *allMsgs {
-			dt := m.TimeWindow
+			dt := m.ParsedTimeStamp
 			secs[i] = dt.Truncate(time.Second)
 		}
 
@@ -44,7 +44,7 @@ func DetectAnomalies(allMsgs *[]FeedMessage) (bool, string) {
 
 	for _, m := range *allMsgs {
 		userID := m.UserID
-		dt := m.TimeWindow
+		dt := m.ParsedTimeStamp
 		byUser[userID] = append(byUser[userID], dt)
 	}
 

@@ -3,16 +3,16 @@ package sentiment
 import "time"
 
 type FeedMessage struct {
-	ID         string   `json:"id" validate:"required,id_field"`
-	Content    string   `json:"content" validate:"required,max=280"`
-	Timestamp  string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"`
-	UserID     string   `json:"user_id" validate:"required,id_field"`
-	Hashtags   []string `json:"hashtags" validate:"required"`
-	Reactions  int      `json:"reactions" validate:"gte=0"`
-	Shares     int      `json:"shares" validate:"gte=0"`
-	Views      int      `json:"views" validate:"gte=0"`
-	TimeWindow time.Time
-	Sentiment  MessageSentiment
+	ID              string   `json:"id" validate:"required,id_field"`
+	Content         string   `json:"content" validate:"required,max=280"`
+	Timestamp       string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"`
+	UserID          string   `json:"user_id" validate:"required,id_field"`
+	Hashtags        []string `json:"hashtags" validate:"required"`
+	Reactions       int      `json:"reactions" validate:"gte=0"`
+	Shares          int      `json:"shares" validate:"gte=0"`
+	Views           int      `json:"views" validate:"gte=0"`
+	ParsedTimeStamp time.Time
+	Sentiment       MessageSentiment
 }
 
 type Feed struct {

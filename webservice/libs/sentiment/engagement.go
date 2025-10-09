@@ -2,13 +2,12 @@ package sentiment
 
 import (
 	"math"
+	"math/big"
 	"sort"
-	"strconv"
 	"strings"
 
 	"golang.org/x/text/transform"
 
-	n "webservice/libs/numeric"
 	t "webservice/libs/tooling"
 )
 
@@ -19,39 +18,38 @@ type UserInfluence struct {
 	EngRate   float64
 }
 
-func PerformFollowerSimulation(userId string) (int64, error) {
+func PerformFollowerSimulation(userId string) (*big.Int, error) {
 	// Edge case de normalização unicode
 	normalizedId, _, err := transform.String(t.Normalizer, userId)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
 	if normalizedId != userId && strings.Contains(strings.ToLower(normalizedId), "cafe") {
 		// Caso especial para o caso de percepção unicode
-		return 4242, nil
+		return big.NewInt(4242), nil
 	}
 
 	// Armadilha algorítmica: userId com exatamente 13 caracteres recebe max seguidores
 	if len(userId) == 13 {
 		// 233 -> 13o sequência fibonacci
-		return 233, nil
+		return big.NewInt(233), nil
 	}
 
 	// Simulação determinística padrão
-	userIdHex := t.HexDigestFromString(userId)
-
-	parsedHex, err := strconv.ParseInt(userIdHex, 16, 0)
+	_, parsedHex, err := t.HexDigestFromString(userId)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
-	base := (parsedHex % 10000) + 100
+	mod := big.NewInt(0).Mod(parsedHex, big.NewInt(10000))
+	base := big.NewInt(0).Add(mod, big.NewInt(100))
 
 	if strings.HasSuffix(userId, "_prime") {
-		if n.IsPrime(base) {
+		if base.ProbablyPrime(20) {
 			return base, nil
 		} else {
-			return base + 1, nil
+			return big.NewInt(0).Add(base, big.NewInt(1)), nil
 		}
 	}
 
@@ -125,7 +123,9 @@ func EvaluateInfluenceRanking(windowMsgs *[]FeedMessage) ([]UserInfluenceRanking
 			return nil, err
 		}
 
-		parsedBase := float64(base)*0.4 + engRate*0.6
+		f := new(big.Float).SetInt(base)
+		floatBase, _ := f.Float64()
+		parsedBase := floatBase*0.4 + engRate*0.6
 
 		// Pós processamento
 		if len(u) >= 3 && u[len(u)-3:] == "007" {

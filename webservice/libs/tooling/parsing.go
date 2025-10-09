@@ -3,6 +3,7 @@ package tooling
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"math/big"
 	"strings"
 	"unicode"
 
@@ -22,9 +23,16 @@ func StripAccentsLower(content string) (string, error) {
 	return strings.ToLower(result), nil
 }
 
-func HexDigestFromString(text string) string {
-	hash := sha256.Sum256([]byte(text))
-	hexString := hex.EncodeToString(hash[:])
+func HexDigestFromString(text string) (*string, *big.Int, error) {
+	hasher := sha256.New()
+	_, err := hasher.Write([]byte(text))
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return hexString
+	sum := hasher.Sum(nil)
+	hashString := hex.EncodeToString(sum)
+	hashInt := new(big.Int).SetBytes(sum)
+
+	return &hashString, hashInt, nil
 }

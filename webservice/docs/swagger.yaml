@@ -24,7 +24,7 @@ definitions:
     description: Estrutura do feed de mensagens, associados a um usuário
     properties:
       messages:
-        description: A lista de mensagem para aquele feed
+        description: A lista de mensagens para aquele feed
         items:
           $ref: '#/definitions/sentiment.FeedMessage'
         type: array
@@ -83,10 +83,13 @@ definitions:
   sentiment.FeedSentiment:
     properties:
       anomaly_detected:
+        description: Indica se alguma anomalia no feed foi detectada
         type: boolean
       anomaly_type:
+        description: Categoria da anomalia ("synchronized_posting" | "burst")
         type: string
       engagement_score:
+        description: Índice de engajamento
         type: number
       flags:
         $ref: '#/definitions/sentiment.FeedSentimentFlags'
@@ -95,47 +98,65 @@ definitions:
           $ref: '#/definitions/sentiment.UserInfluenceRanking'
         type: array
       processing_time_ms:
+        description: Auxiliar. Tempo de processamento da análise, em milissegundos
         type: number
       sentiment_distribution:
         $ref: '#/definitions/sentiment.FeedSentimentDistribution'
       trending_topics:
+        description: Lista unificada de hashtags, citadas nas mensagens
         items:
           type: string
         type: array
     type: object
   sentiment.FeedSentimentDistribution:
-    description: Contém o percentual de mensagem message feed.
+    description: Percentuais dos sentimentos detectados das mensagens, por categoria
     properties:
       negative:
+        description: Fração de mensagens com sentimento negativo
         type: number
       neutral:
+        description: Fração de mensagens com sentimento nêutro
         type: number
       positive:
+        description: Fração de mensagens com sentimento positivo
         type: number
     type: object
   sentiment.FeedSentimentFlags:
+    description: Indicadores de casos especiais detectados nas mensagens
     properties:
       candidate_awareness:
+        description: Indica se o conteúdo normalizado da mensagem corresponde a "teste
+          tecnico mbras"
         type: boolean
       mbras_employee:
+        description: Indica se o "user_id" contém a substring "mbras"
         type: boolean
       special_pattern:
+        description: Indica a condição anterior e se também a mensagem possui exatamente
+          42 caracteres
         type: boolean
     type: object
   sentiment.MessageSentiment:
     properties:
       label:
+        description: Categoria do sentimento ("positive" | "negative" | "neutral"),
+          de acordo com o valor do escore
         type: string
       processing_time_ms:
+        description: Auxiliar. Tempo de processamento da análise em milissegundos
         type: number
       score:
+        description: Número real, expressando quantitativamente o sentimento da mensagem
         type: number
     type: object
   sentiment.UserInfluenceRanking:
+    description: Objeto contendo o índice de influência no feed para um usuário
     properties:
       influence_score:
+        description: Índice de influência
         type: number
       user_id:
+        description: Identificação do usuario, e.g. user_123
         type: string
     type: object
 info:

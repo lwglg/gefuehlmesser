@@ -11,7 +11,7 @@ type FeedMessage struct {
 	Content         string   `json:"content" validate:"required,max=280"`                         // O conteúdo textual da mensagem
 	Timestamp       string   `json:"timestamp" validate:"required,datetime=YYYY-MM-DDTHH:MM:SSZ"` // Data/hora local, em formato UTC (GMT - ZULU Time)
 	UserID          string   `json:"user_id" validate:"required,id_field"`                        // ID do usuário ao qual a mensagem está associada, e.g. user_324
-	Hashtags        []string `json:"hashtags" validate:"required"`                                // Lista de hashtags associadas às mensagens do feed
+	Hashtags        []string `json:"hashtags" validate:"required,dive,hashtag"`                   // Lista de hashtags associadas às mensagens do feed
 	Reactions       int      `json:"reactions" validate:"gte=0"`                                  // Total de reações a mensagem
 	Shares          int      `json:"shares" validate:"gte=0"`                                     // Total de cxompartilhamentos da mensagem
 	Views           int      `json:"views" validate:"gte=0"`                                      // Total de visualizações da mensagem
